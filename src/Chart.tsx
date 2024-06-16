@@ -1,46 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import { Column } from '@ant-design/charts';
-
-interface PopulationData {
-  year: number;
-  country: string;
-  population: number;
-}
-
-const mockData: PopulationData[] = [
-  { year: 1950, country: 'China', population: 554419263 },
-  { year: 1950, country: 'India', population: 376325200 },
-  { year: 1950, country: 'USA', population: 158804398 },
-  { year: 1951, country: 'China', population: 560005300 },
-  { year: 1951, country: 'India', population: 381603200 },
-  { year: 1951, country: 'USA', population: 159880800 },
-  // ... add more data points as needed
-];
+import { Bar } from '@ant-design/charts';
+import populationData from './db.json'; // Assuming db.json is correctly imported and formatted
 
 const Chart: React.FC = () => {
-  const [data, setData] = useState<PopulationData[]>([]);
-  const [year, setYear] = useState<number>(1950);
+  const [currentYearIndex, setCurrentYearIndex] = useState(0);
+  const [year, setYear] = useState<number>(parseInt(populationData.population[currentYearIndex].Year));
 
   useEffect(() => {
-    const updateData = () => {
-      const filteredData = mockData.filter(item => item.year === year);
-      setData(filteredData);
-    };
-
-    updateData();
-
     const interval = setInterval(() => {
-      setYear((prevYear) => prevYear + 1);
-      updateData();
-    }, 10000);
+      setCurrentYearIndex(prevIndex => (prevIndex < populationData.population.length - 1 ? prevIndex + 1 : 0));
+    }, 1000); // Update every second (adjust interval as needed)
 
     return () => clearInterval(interval);
-  }, [year]);
+  }, []);
+
+  useEffect(() => {
+    setYear(parseInt(populationData.population[currentYearIndex].Year));
+  }, [currentYearIndex]);
+
+  // Filter and sort data by population, then take top 12 countries
+  const filteredData = populationData.population
+    .filter(item => item.Year === year.toString())
+    .sort((a, b) => parseInt(b.Population) - parseInt(a.Population))
+    .slice(0, 12);
 
   const config = {
-    data,
-    xField: 'country',
-    yField: 'population',
+    data: filteredData,
+    xField: 'Country name',
+    yField: 'Population',
     label: {
       position: 'middle',
       style: {
@@ -55,14 +42,14 @@ const Chart: React.FC = () => {
       },
     },
     meta: {
-      country: { alias: 'Country' },
-      population: { alias: 'Population' },
+      'Country name': { alias: 'Country' },
+      Population: { alias: 'Population' },
     },
   };
 
   return (
     <div className="p-4">
-      <Column {...config} />
+      <Bar {...config} />
       <div className="text-center mt-4">
         <p className="text-xl">Year: {year}</p>
       </div>
