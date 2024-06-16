@@ -41,7 +41,7 @@ const Chart: React.FC = () => {
     xField: 'Country name',
     yField: 'Population',
     label: {
-      position: 'middle',
+      position: 'right', // Position labels to the right of bars
       style: {
         fill: '#FFFFFF',
         opacity: 0.6,
