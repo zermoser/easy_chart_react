@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { Bar } from '@ant-design/charts';
-import populationData from './db.json'; // Assuming db.json is correctly imported and formatted
+import populationData from './db.json';
 
 const Chart: React.FC = () => {
   const [currentYearIndex, setCurrentYearIndex] = useState(0);
-  const [year, setYear] = useState<number>(parseInt(populationData.population[currentYearIndex].Year));
-  const [previousData, setPreviousData] = useState([]); // State to store previous data
+  const [year, setYear] = useState<number>(
+    parseInt(populationData.population[currentYearIndex].Year)
+  );
+  const [previousData, setPreviousData] = useState([]);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentYearIndex(prevIndex => (prevIndex < populationData.population.length - 1 ? prevIndex + 1 : 0));
-    }, 1000); // Update every second (adjust interval as needed)
+      setCurrentYearIndex((prevIndex) =>
+        prevIndex < populationData.population.length - 1 ? prevIndex + 1 : 0
+      );
+    }, 10000);
 
     return () => clearInterval(interval);
   }, []);
@@ -20,29 +24,26 @@ const Chart: React.FC = () => {
   }, [currentYearIndex]);
 
   useEffect(() => {
-    // Filter and sort data by population, then take top 12 countries
     const filteredData = populationData.population
-      .filter(item => item.Year === year.toString())
+      .filter((item) => item.Year === year.toString())
       .sort((a, b) => parseInt(b.Population) - parseInt(a.Population))
       .slice(0, 12);
 
-    // Update currentData incrementally starting from previousData
-    const updatedData = filteredData.map(newItem => {
-      const prevItem = previousData.find(item => item['Country name'] === newItem['Country name']);
-      const formattedPopulation = parseInt(newItem.Population).toLocaleString(); // Format population number
-      return prevItem ? { ...prevItem, Population: formattedPopulation } : { ...newItem, Population: formattedPopulation };
+    const updatedData = filteredData.map((newItem, index) => {
+      const formattedPopulation = parseInt(newItem.Population).toLocaleString();
+      return { ...newItem, Population: formattedPopulation, color: `rgb(${index * 2}, ${index * 3}, ${index * 4})` };
     });
 
-    // Update previousData to current filteredData
     setPreviousData(updatedData);
-  }, [year, previousData]); // Trigger when year changes or previousData changes
+  }, [year]);
 
   const config = {
     data: previousData,
     xField: 'Country name',
     yField: 'Population',
+    colorField: 'color',
     label: {
-      position: 'right', // Position labels to the right of bars
+      position: 'right',
       style: {
         fill: '#FFFFFF',
         opacity: 1,
@@ -58,7 +59,7 @@ const Chart: React.FC = () => {
       'Country name': { alias: 'Country' },
       Population: { alias: 'Population' },
     },
-    animate: false, // Disable animation
+    animate: false,
   };
 
   return (
