@@ -14,7 +14,7 @@ const Chart: React.FC = () => {
       setCurrentYearIndex((prevIndex) =>
         prevIndex < populationData.population.length - 1 ? prevIndex + 1 : 0
       );
-    }, 10000);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);
@@ -29,9 +29,9 @@ const Chart: React.FC = () => {
       .sort((a, b) => parseInt(b.Population) - parseInt(a.Population))
       .slice(0, 12);
 
-    const updatedData = filteredData.map((newItem, index) => {
+    const updatedData = filteredData.map((newItem) => {
       const formattedPopulation = parseInt(newItem.Population).toLocaleString();
-      return { ...newItem, Population: formattedPopulation, color: `rgb(${index * 2}, ${index * 3}, ${index * 4})` };
+      return { ...newItem, Population: formattedPopulation  };
     });
 
     setPreviousData(updatedData);
@@ -49,16 +49,7 @@ const Chart: React.FC = () => {
         opacity: 1,
       },
     },
-    xAxis: {
-      label: {
-        autoHide: true,
-        autoRotate: false,
-      },
-    },
-    meta: {
-      'Country name': { alias: 'Country' },
-      Population: { alias: 'Population' },
-    },
+
     animate: false,
   };
 
