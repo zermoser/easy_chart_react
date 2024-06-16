@@ -5,6 +5,7 @@ import populationData from './db.json'; // Assuming db.json is correctly importe
 const Chart: React.FC = () => {
   const [currentYearIndex, setCurrentYearIndex] = useState(0);
   const [year, setYear] = useState<number>(parseInt(populationData.population[currentYearIndex].Year));
+  const [previousData, setPreviousData] = useState([]); // State to store previous data
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -18,14 +19,25 @@ const Chart: React.FC = () => {
     setYear(parseInt(populationData.population[currentYearIndex].Year));
   }, [currentYearIndex]);
 
-  // Filter and sort data by population, then take top 12 countries
-  const filteredData = populationData.population
-    .filter(item => item.Year === year.toString())
-    .sort((a, b) => parseInt(b.Population) - parseInt(a.Population))
-    .slice(0, 12);
+  useEffect(() => {
+    // Filter and sort data by population, then take top 12 countries
+    const filteredData = populationData.population
+      .filter(item => item.Year === year.toString())
+      .sort((a, b) => parseInt(b.Population) - parseInt(a.Population))
+      .slice(0, 12);
+
+    // Update currentData incrementally starting from previousData
+    const updatedData = filteredData.map(newItem => {
+      const prevItem = previousData.find(item => item['Country name'] === newItem['Country name']);
+      return prevItem ? { ...prevItem, Population: newItem.Population } : newItem;
+    });
+
+    // Update previousData to current filteredData
+    setPreviousData(updatedData);
+  }, [year, previousData]); // Trigger when year changes or previousData changes
 
   const config = {
-    data: filteredData,
+    data: previousData,
     xField: 'Country name',
     yField: 'Population',
     label: {
@@ -45,6 +57,7 @@ const Chart: React.FC = () => {
       'Country name': { alias: 'Country' },
       Population: { alias: 'Population' },
     },
+    animate: false, // Disable animation
   };
 
   return (
