@@ -31,7 +31,7 @@ const Chart: React.FC = () => {
 
     const updatedData = filteredData.map((newItem) => {
       const formattedPopulation = parseInt(newItem.Population).toLocaleString();
-      return { ...newItem, Population: formattedPopulation  };
+      return { ...newItem, Population: formattedPopulation };
     });
 
     setPreviousData(updatedData);
@@ -39,17 +39,16 @@ const Chart: React.FC = () => {
 
   const config = {
     data: previousData,
-    xField: 'Country name',
+    xField: 'CountryName',
     yField: 'Population',
-    colorField: 'color',
+    colorField: 'CountryName',
+    color: 'color',
     label: {
       position: 'right',
       style: {
         fill: '#FFFFFF',
-        opacity: 1,
       },
     },
-
     animate: false,
   };
 
