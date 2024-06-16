@@ -29,7 +29,8 @@ const Chart: React.FC = () => {
     // Update currentData incrementally starting from previousData
     const updatedData = filteredData.map(newItem => {
       const prevItem = previousData.find(item => item['Country name'] === newItem['Country name']);
-      return prevItem ? { ...prevItem, Population: newItem.Population } : newItem;
+      const formattedPopulation = parseInt(newItem.Population).toLocaleString(); // Format population number
+      return prevItem ? { ...prevItem, Population: formattedPopulation } : { ...newItem, Population: formattedPopulation };
     });
 
     // Update previousData to current filteredData
@@ -44,7 +45,7 @@ const Chart: React.FC = () => {
       position: 'right', // Position labels to the right of bars
       style: {
         fill: '#FFFFFF',
-        opacity: 0.6,
+        opacity: 1,
       },
     },
     xAxis: {
